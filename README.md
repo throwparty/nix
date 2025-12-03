@@ -1,0 +1,5 @@
+# Nix
+
+Configuration for our development environments.
+
+______________________________________________________________________
