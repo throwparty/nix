@@ -1,4 +1,7 @@
 { lib, pkgs }:
+let
+  node = import ./node.nix { inherit pkgs lib; };
+in
 {
   default =
     let
@@ -34,4 +37,9 @@
       ];
       shellHook = "cat ${toolVersions}";
     };
+
+  nodejs_24 = node.mkNodeShell {
+    name = "nodejs_24";
+    nodejs = pkgs.nodejs_24;
+  };
 }
