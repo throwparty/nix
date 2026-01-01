@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "encore": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768765837,
+        "narHash": "sha256-KNzMFI+OP8rF6SYud6u3w3HjeHAGxTFeVTV0RrRRdAs=",
+        "owner": "encoredev",
+        "repo": "encore-flake",
+        "rev": "d967b87343c4b79b62c1410b8a1809b39b20b198",
+        "type": "github"
+      },
+      "original": {
+        "owner": "encoredev",
+        "repo": "encore-flake",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -36,6 +56,7 @@
     },
     "root": {
       "inputs": {
+        "encore": "encore",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs"
       }

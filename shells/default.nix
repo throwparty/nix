@@ -1,4 +1,4 @@
-{ lib, pkgs }:
+{ encore, lib, pkgs }:
 let
   node = import ./node.nix { inherit pkgs lib; };
 in
@@ -37,6 +37,12 @@ in
       ];
       shellHook = "cat ${toolVersions}";
     };
+
+  encore = pkgs.mkShell {
+    buildInputs =
+      [ encore.packages.${pkgs.stdenv.hostPlatform.system}.encore ]
+      ++ (with pkgs; [ go ]);
+  };
 
   nodejs_24 = node.mkNodeShell {
     name = "nodejs_24";
