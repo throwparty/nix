@@ -1,7 +1,6 @@
-{ pkgs }:
 {
   mkToolVersions =
-    name: commands:
+    { pkgs, name, commands }:
     let
       versionScript = pkgs.writeShellScript "${name}-version-script" ''
         {

@@ -15,15 +15,19 @@ in
         toml-sort
         treefmt
         ;
-      toolVersions = lib.mkToolVersions "default" ''
-        ${getExe just} --version
-        ${getExe mdformat} --version
-        ${getExe' nil "nil"} --version
-        ${getExe nixd} --version
-        ${getExe nixfmt-rfc-style} --version
-        ${getExe toml-sort} --version
-        ${getExe treefmt} --version
-      '';
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "default";
+        commands = ''
+          ${getExe just} --version
+          ${getExe mdformat} --version
+          ${getExe' nil "nil"} --version
+          ${getExe nixd} --version
+          ${getExe nixfmt-rfc-style} --version
+          ${getExe toml-sort} --version
+          ${getExe treefmt} --version
+        '';
+      };
     in
     pkgs.mkShell {
       buildInputs = [
