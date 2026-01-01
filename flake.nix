@@ -14,14 +14,16 @@
       flake-utils,
       nixpkgs,
       ...
-    }:
+    }@attrs:
+    let
+      lib = import ./lib.nix;
+    in
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs {
           inherit system;
         };
-        lib = import ./lib.nix { inherit pkgs; };
       in
       {
         inherit lib;
@@ -31,5 +33,8 @@
           lib = pkgs.lib // lib;
         };
       }
-    );
+    )
+    // {
+      inherit lib;
+    };
 }
