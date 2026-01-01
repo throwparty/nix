@@ -1,30 +1,23 @@
-{ encore, lib, pkgs }:
-let
-  node = import ./node.nix { inherit pkgs lib; };
-in
 {
-  default =
+  encore,
+  lib,
+  pkgs,
+}:
+let
+  inherit (lib) getExe getExe';
+  encoreFlake = encore;
+  node = import ./node.nix { inherit pkgs lib; };
+  commonTools =
     let
-      inherit (lib) getExe getExe';
       inherit (pkgs)
         just
-        mdformat
-        nil
-        nixd
-        nixfmt-rfc-style
-        toml-sort
         treefmt
         ;
       toolVersions = lib.mkToolVersions {
         inherit pkgs;
-        name = "default";
+        name = "commonTools";
         commands = ''
           ${getExe just} --version
-          ${getExe mdformat} --version
-          ${getExe' nil "nil"} --version
-          ${getExe nixd} --version
-          ${getExe nixfmt-rfc-style} --version
-          ${getExe toml-sort} --version
           ${getExe treefmt} --version
         '';
       };
@@ -32,24 +25,70 @@ in
     pkgs.mkShell {
       buildInputs = [
         just
+        treefmt
+      ];
+      shellHook = "cat ${toolVersions}";
+    };
+in
+{
+  inherit commonTools;
+
+  default =
+    let
+      inherit (pkgs)
         mdformat
         nil
         nixd
         nixfmt-rfc-style
         toml-sort
-        treefmt
+        ;
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "default";
+        commands = ''
+          ${getExe mdformat} --version
+          ${getExe nixfmt-rfc-style} --version
+          ${getExe toml-sort} --version
+          ${getExe' nil "nil"} --version
+          ${getExe nixd} --version
+        '';
+      };
+    in
+    commonTools.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [
+        mdformat
+        nil
+        nixd
+        nixfmt-rfc-style
+        toml-sort
       ];
-      shellHook = "cat ${toolVersions}";
-    };
+      shellHook = old.shellHook + "\ncat ${toolVersions}";
+    });
 
-  encore = pkgs.mkShell {
-    buildInputs =
-      [ encore.packages.${pkgs.stdenv.hostPlatform.system}.encore ]
-      ++ (with pkgs; [ go ]);
-  };
+  encore =
+    let
+      inherit (encoreFlake.packages.${pkgs.stdenv.hostPlatform.system}) encore;
+      inherit (pkgs) go;
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "encore";
+        commands = ''
+          ${getExe' encore "encore"} version | grep ^encore
+          ${getExe go} version
+        '';
+      };
+    in
+    commonTools.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [
+        encore
+        go
+      ];
+      shellHook = old.shellHook + "\ncat ${toolVersions}";
+    });
 
   nodejs_24 = node.mkNodeShell {
     name = "nodejs_24";
+    baseShell = commonTools;
     nodejs = pkgs.nodejs_24;
   };
 }

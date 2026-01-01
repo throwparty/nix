@@ -2,6 +2,7 @@
 {
   mkNodeShell =
     {
+      baseShell,
       nodejs,
       name ? "node",
       ...
@@ -20,11 +21,11 @@
         '';
       };
     in
-    pkgs.mkShell {
-      buildInputs = [
+    baseShell.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [
         nodejs
         pkgs.yarn
       ];
-      shellHook = "cat ${toolVersions}";
-    };
+      shellHook = old.shellHook + "\ncat ${toolVersions}";
+    });
 }

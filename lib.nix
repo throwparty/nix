@@ -1,11 +1,16 @@
 {
   mkToolVersions =
-    { pkgs, name, commands }:
+    {
+      pkgs,
+      name,
+      commands,
+    }:
     let
       versionScript = pkgs.writeShellScript "${name}-version-script" ''
+        echo "From ${name}:" >>"$out"
         {
           ${commands}
-        } >>"$out"
+        } | sort | sed 's/^/  /' >>"$out"
       '';
     in
     pkgs.runCommand "${name}-versions" {
