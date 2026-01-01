@@ -36,5 +36,21 @@
     )
     // {
       inherit lib;
+    }
+    // {
+      nixosConfigurations.builder-aarch64 = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        specialArgs = attrs;
+        modules = [
+          ./builder/lima.nix
+        ];
+      };
+      nixosConfigurations.builder-x86_64 = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = attrs;
+        modules = [
+          ./builder/ima.nix
+        ];
+      };
     };
 }
