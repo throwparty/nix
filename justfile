@@ -13,6 +13,10 @@ lint:
     just build
 
 build-devshells:
-    nix build '.#devShells.aarch64-darwin.default' '.#devShells.aarch64-darwin.nodejs_24' --print-build-logs
+    #!/usr/bin/env bash
+    set -eux -o pipefail
+    system="$(nix eval --raw --impure --expr 'builtins.currentSystem')"
+    shells=( $(nix flake show --json 2>/dev/null | jq -r --arg sys "$system" '.devShells[$sys] | keys[] | ".#devShells." + $sys + "." + .') )
+    nix build --no-link --print-build-logs "${shells[@]}"
 
 build: build-devshells
