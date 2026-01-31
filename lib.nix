@@ -1,4 +1,11 @@
 {
+  mergeShells =
+    shell1: shell2:
+    shell1.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ shell2.buildInputs;
+      shellHook = old.shellHook + "\n" + shell2.shellHook;
+    });
+
   mkToolVersions =
     {
       pkgs,
