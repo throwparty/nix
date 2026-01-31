@@ -68,13 +68,17 @@ in
   encore =
     let
       inherit (encoreFlake.packages.${pkgs.stdenv.hostPlatform.system}) encore;
-      inherit (pkgs) go;
+      inherit (pkgs)
+        go
+        postgresql_15
+        ;
       toolVersions = lib.mkToolVersions {
         inherit pkgs;
         name = "encore";
         commands = ''
           ${getExe' encore "encore"} version | grep ^encore
           ${getExe go} version
+          ${getExe' postgresql_15 "psql"} --version
         '';
       };
     in
@@ -82,6 +86,7 @@ in
       buildInputs = (old.buildInputs or [ ]) ++ [
         encore
         go
+        postgresql_15
       ];
       shellHook = old.shellHook + "\ncat ${toolVersions}";
     });
