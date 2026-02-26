@@ -1,5 +1,6 @@
 {
   description = "throwparty/nix";
+
   inputs = {
     encore = {
       url = "github:encoredev/encore-flake";
@@ -8,6 +9,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
   };
+
   outputs =
     {
       encore,
@@ -16,7 +18,7 @@
       ...
     }@attrs:
     let
-      lib = import ./lib.nix;
+      lib = import ./lib.nix { lib = nixpkgs.lib; };
     in
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -26,7 +28,6 @@
         };
       in
       {
-        inherit lib;
         devShells = import ./shells/default.nix {
           inherit pkgs;
           inherit encore;
@@ -36,8 +37,6 @@
     )
     // {
       inherit lib;
-    }
-    // {
       nixosConfigurations.builder-aarch64 = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = attrs;

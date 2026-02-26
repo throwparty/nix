@@ -6,7 +6,6 @@
 let
   inherit (lib) getExe getExe';
   encoreFlake = encore;
-  node = import ./node.nix { inherit pkgs lib; };
   commonTools =
     let
       inherit (pkgs)
@@ -48,22 +47,25 @@ in
         commands = ''
           ${getExe mdformat} --version
           ${getExe nixfmt-rfc-style} --version
-          ${getExe toml-sort} --version
+          printf "toml-sort %s\n" "$(${getExe toml-sort} --version)"
           ${getExe' nil "nil"} --version
           ${getExe nixd} --version
         '';
       };
     in
-    commonTools.overrideAttrs (old: {
-      buildInputs = (old.buildInputs or [ ]) ++ [
-        mdformat
-        nil
-        nixd
-        nixfmt-rfc-style
-        toml-sort
-      ];
-      shellHook = old.shellHook + "\ncat ${toolVersions}";
-    });
+    lib.mergeShells [
+      commonTools
+      (pkgs.mkShell {
+        buildInputs = [
+          mdformat
+          nil
+          nixd
+          nixfmt-rfc-style
+          toml-sort
+        ];
+        shellHook = "cat ${toolVersions}";
+      })
+    ];
 
   encore =
     let
@@ -82,18 +84,50 @@ in
         '';
       };
     in
-    commonTools.overrideAttrs (old: {
-      buildInputs = (old.buildInputs or [ ]) ++ [
+    pkgs.mkShell {
+      buildInputs = [
         encore
         go
         postgresql_15
       ];
-      shellHook = old.shellHook + "\ncat ${toolVersions}";
-    });
+      shellHook = "cat ${toolVersions}";
+    };
 
-  nodejs_24 = node.mkNodeShell {
+  githubActions =
+    let
+      inherit (pkgs)
+        act
+        actionlint
+        zizmor
+        ;
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "github_actions";
+        commands = ''
+          ${getExe act} --version
+          printf "actionlint %s\n" "$(${getExe actionlint} --version | head -n 1)"
+          ${getExe zizmor} --version
+        '';
+      };
+    in
+    pkgs.mkShell {
+      buildInputs = [
+        act
+        actionlint
+        zizmor
+      ];
+      shellHook = "cat ${toolVersions}";
+    };
+
+  golang_1_25 = lib.mkGoShell {
+    inherit pkgs;
+    name = "golang_1_25";
+    go = pkgs.go;
+  };
+
+  nodejs_24 = lib.mkNodeShell {
+    inherit pkgs;
     name = "nodejs_24";
-    baseShell = commonTools;
     nodejs = pkgs.nodejs_24;
   };
 }
