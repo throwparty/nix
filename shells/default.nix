@@ -130,4 +130,10 @@ in
     name = "nodejs_24";
     nodejs = pkgs.nodejs_24;
   };
+
+  rust_stable = lib.mkRustShell {
+    inherit pkgs;
+    name = "rust_stable";
+    rustToolchain = pkgs.rust-bin.stable.latest.default;
+  };
 }

@@ -8,6 +8,10 @@
     };
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -15,6 +19,7 @@
       encore,
       flake-utils,
       nixpkgs,
+      rust-overlay,
       ...
     }@attrs:
     let
@@ -25,6 +30,9 @@
       let
         pkgs = import nixpkgs {
           inherit system;
+          overlays = [
+            (import rust-overlay)
+          ];
         };
       in
       {

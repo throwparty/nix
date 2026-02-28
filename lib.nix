@@ -97,6 +97,30 @@ let
         ];
         shellHook = "cat ${toolVersions}";
       };
+
+    mkRustShell =
+      {
+        pkgs,
+        rustToolchain,
+        name ? "rust",
+        ...
+      }:
+      let
+        toolVersions = customLib.mkToolVersions {
+          inherit
+            name
+            pkgs
+            ;
+          commands = ''
+            ${getExe' rustToolchain "cargo"} --version
+            ${getExe' rustToolchain "rustc"} --version
+          '';
+        };
+      in
+      pkgs.mkShell {
+        buildInputs = [ rustToolchain ];
+        shellHook = "cat ${toolVersions}";
+      };
   };
 in
 customLib
