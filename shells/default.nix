@@ -10,6 +10,7 @@ let
     let
       inherit (pkgs)
         just
+        prek
         treefmt
         ;
       toolVersions = lib.mkToolVersions {
@@ -17,6 +18,7 @@ let
         name = "commonTools";
         commands = ''
           ${getExe just} --version
+          ${getExe prek} --version
           ${getExe treefmt} --version
         '';
       };
@@ -24,6 +26,7 @@ let
     pkgs.mkShell {
       buildInputs = [
         just
+        prek
         treefmt
       ];
       shellHook = "cat ${toolVersions}";
