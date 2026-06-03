@@ -101,6 +101,7 @@ in
       inherit (pkgs)
         act
         actionlint
+        ratchet
         zizmor
         ;
       toolVersions = lib.mkToolVersions {
@@ -109,6 +110,7 @@ in
         commands = ''
           ${getExe act} --version
           printf "actionlint %s\n" "$(${getExe actionlint} --version | head -n 1)"
+          ${getExe ratchet} --version 2>&1
           ${getExe zizmor} --version
         '';
       };
@@ -117,6 +119,7 @@ in
       buildInputs = [
         act
         actionlint
+        ratchet
         zizmor
       ];
       shellHook = "cat ${toolVersions}";
