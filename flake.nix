@@ -28,6 +28,19 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
+        basePkgs = import nixpkgs { inherit system; };
+        rustPkgs = import nixpkgs {
+          inherit system;
+          overlays = [ (import rust-overlay) ];
+        };
+        fetchCargoVendor = import "${nixpkgs.outPath}/pkgs/build-support/rust/fetch-cargo-vendor.nix" {
+          inherit (basePkgs) lib stdenvNoCC runCommand writers python3Packages cargo cacert;
+          nix-prefetch-git = basePkgs.nix-prefetch-git.override { git-lfs = null; };
+        };
+        customZizmor = basePkgs.callPackage ./packages/zizmor/default.nix {
+          inherit fetchCargoVendor;
+          inherit (rustPkgs) rust-bin;
+        };
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
@@ -36,6 +49,7 @@
         };
       in
       {
+        packages.zizmor = customZizmor;
         devShells = import ./shells/default.nix {
           inherit pkgs;
           inherit encore;
