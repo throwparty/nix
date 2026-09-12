@@ -19,4 +19,11 @@ build-devshells +build_args="":
     shells=( $(nix flake show --json 2>/dev/null | jq -r --arg sys "$system" '.devShells[$sys] | keys[] | ".#devShells." + $sys + "." + .') )
     nix build --no-link --print-build-logs {{ build_args }} "${shells[@]}"
 
-build: build-devshells
+build-packages +build_args="":
+    #!/usr/bin/env bash
+    set -eux -o pipefail
+    system="$(nix eval --raw --impure --expr 'builtins.currentSystem')"
+    packages=( $(nix flake show --json 2>/dev/null | jq -r --arg sys "$system" '.packages[$sys] | keys[] | ".#packages." + $sys + "." + .') )
+    nix build --no-link --print-build-logs {{ build_args }} "${packages[@]}"
+
+build: build-devshells build-packages
