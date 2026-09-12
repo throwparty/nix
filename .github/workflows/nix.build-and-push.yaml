@@ -1,0 +1,38 @@
+name: "Nix: build and push"
+
+on:
+  workflow_call: {}
+
+concurrency:
+  group: nix.build-and-push-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  build-and-push:
+    name: Build and push to cachix
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: nix develop . --command bash -euo pipefail {0} # zizmor: ignore[misfeature]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Nix
+        uses: $/.github/actions/setup-nix
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build packages
+        run: nix build .#packages.zizmor
+      - name: Push to cachix
+        uses: cachix/cachix-action@38b082610b782e7e93e209c35fd730d399dee866 # ratchet:cachix/cachix-action@v17
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}

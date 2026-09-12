@@ -1,0 +1,35 @@
+name: "Workflows: lint"
+
+on:
+  workflow_call: {}
+
+concurrency:
+  group: workflows.lint-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: nix develop . --command bash -euo pipefail {0} # zizmor: ignore[misfeature]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix
+        uses: $/.github/actions/setup-nix
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run actionlint
+        run: just workflows actionlint
+      - name: Run zizmor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: just workflows zizmor
