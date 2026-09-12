@@ -59,9 +59,28 @@ let
       ];
       shellHook = "cat ${toolVersions}";
     };
+  shell =
+    let
+      inherit (pkgs)
+        bats
+        ;
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "shell";
+        commands = ''
+          ${getExe bats} --version
+        '';
+      };
+    in
+    pkgs.mkShell {
+      buildInputs = [
+        bats
+      ];
+      shellHook = "cat ${toolVersions}";
+    };
 in
 {
-  inherit commonTools githubActions;
+  inherit commonTools githubActions shell;
 
   default =
     let
@@ -89,6 +108,7 @@ in
     lib.mergeShells [
       commonTools
       githubActions
+      shell
       (pkgs.mkShell {
         buildInputs = [
           cachix
