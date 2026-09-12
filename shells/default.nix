@@ -38,6 +38,7 @@ in
   default =
     let
       inherit (pkgs)
+        cachix
         mdformat
         nil
         nixd
@@ -48,6 +49,7 @@ in
         inherit pkgs;
         name = "default";
         commands = ''
+          ${getExe cachix} --version
           ${getExe mdformat} --version
           ${getExe nixfmt-rfc-style} --version
           printf "toml-sort %s\n" "$(${getExe toml-sort} --version)"
@@ -60,6 +62,7 @@ in
       commonTools
       (pkgs.mkShell {
         buildInputs = [
+          cachix
           mdformat
           nil
           nixd
