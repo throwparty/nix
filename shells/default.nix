@@ -89,7 +89,7 @@ in
         mdformat
         nil
         nixd
-        nixfmt-rfc-style
+        nixfmt
         toml-sort
         ;
       toolVersions = lib.mkToolVersions {
@@ -98,7 +98,7 @@ in
         commands = ''
           ${getExe cachix} --version
           ${getExe mdformat} --version
-          ${getExe nixfmt-rfc-style} --version
+          ${getExe nixfmt} --version
           printf "toml-sort %s\n" "$(${getExe toml-sort} --version)"
           ${getExe' nil "nil"} --version
           ${getExe nixd} --version
@@ -115,7 +115,7 @@ in
           mdformat
           nil
           nixd
-          nixfmt-rfc-style
+          nixfmt
           toml-sort
         ];
         shellHook = "cat ${toolVersions}";
