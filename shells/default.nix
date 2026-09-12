@@ -109,7 +109,7 @@ in
         ;
       toolVersions = lib.mkToolVersions {
         inherit pkgs;
-        name = "github_actions";
+        name = "githubActions";
         commands = ''
           ${getExe act} --version
           printf "actionlint %s\n" "$(${getExe actionlint} --version | head -n 1)"
