@@ -31,9 +31,37 @@ let
       ];
       shellHook = "cat ${toolVersions}";
     };
+  githubActions =
+    let
+      inherit (pkgs)
+        act
+        actionlint
+        ratchet
+        zizmor
+        ;
+      toolVersions = lib.mkToolVersions {
+        inherit pkgs;
+        name = "githubActions";
+        commands = ''
+          ${getExe act} --version
+          printf "actionlint %s\n" "$(${getExe actionlint} --version | head -n 1)"
+          ${getExe ratchet} --version 2>&1
+          ${getExe zizmor} --version
+        '';
+      };
+    in
+    pkgs.mkShell {
+      buildInputs = [
+        act
+        actionlint
+        ratchet
+        zizmor
+      ];
+      shellHook = "cat ${toolVersions}";
+    };
 in
 {
-  inherit commonTools;
+  inherit commonTools githubActions;
 
   default =
     let
@@ -60,6 +88,7 @@ in
     in
     lib.mergeShells [
       commonTools
+      githubActions
       (pkgs.mkShell {
         buildInputs = [
           cachix
@@ -95,35 +124,6 @@ in
         encore
         go
         postgresql_15
-      ];
-      shellHook = "cat ${toolVersions}";
-    };
-
-  githubActions =
-    let
-      inherit (pkgs)
-        act
-        actionlint
-        ratchet
-        zizmor
-        ;
-      toolVersions = lib.mkToolVersions {
-        inherit pkgs;
-        name = "githubActions";
-        commands = ''
-          ${getExe act} --version
-          printf "actionlint %s\n" "$(${getExe actionlint} --version | head -n 1)"
-          ${getExe ratchet} --version 2>&1
-          ${getExe zizmor} --version
-        '';
-      };
-    in
-    pkgs.mkShell {
-      buildInputs = [
-        act
-        actionlint
-        ratchet
-        zizmor
       ];
       shellHook = "cat ${toolVersions}";
     };
